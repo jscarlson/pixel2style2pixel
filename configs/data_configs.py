@@ -38,4 +38,11 @@ DATASETS = {
 		'test_source_root': dataset_paths['celeba_test'],
 		'test_target_root': dataset_paths['celeba_test'],
 	},
+	'font_style_transfer': {
+		'transforms': transforms_config.FontTransforms,
+		'train_source_root': dataset_paths['font_train_modern'],
+		'train_target_root': dataset_paths['font_train_historical'],
+		'test_source_root': dataset_paths['font_test_modern'],
+		'test_target_root': dataset_paths['font_test_historical'],
+	},
 }

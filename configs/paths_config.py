@@ -6,6 +6,10 @@ dataset_paths = {
 	'celeba_train_segmentation': '',
 	'celeba_test_segmentation': '',
 	'ffhq': '',
+	'font_train_modern': '/mnt/data01/pr_img/rendered_chars',
+	'font_test_modern': '/mnt/data01/pr_img/rendered_chars',
+	'font_train_historical': '/mnt/data01/pr_img/char_crops',
+	'font_test_historical': '/mnt/data01/pr_img/char_crops'
 }
 
 model_paths = {
