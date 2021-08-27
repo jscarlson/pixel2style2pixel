@@ -21,5 +21,5 @@ model_paths = {
 	'mtcnn_onet': 'pretrained_models/mtcnn/onet.npy',
 	'shape_predictor': 'shape_predictor_68_face_landmarks.dat',
 	'moco': 'pretrained_models/moco_v2_800ep_pretrain.pth.tar',
-	'stylegan_font': '/content/drive/MyDrive/stylegan2-ada-training-runs/00000-char_crops_for_stylegan2_ada-auto1/network-snapshot-002000.pkl'
+	'stylegan_font': '/content/drive/MyDrive/stylegan2-ada-training-runs/00000-char_crops_for_stylegan2_ada-auto1/network-snapshot-002000.pt'
 }
