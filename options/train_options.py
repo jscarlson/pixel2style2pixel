@@ -44,6 +44,9 @@ class TrainOptions:
 		self.parser.add_argument('--val_interval', default=1000, type=int, help='Validation interval')
 		self.parser.add_argument('--save_interval', default=None, type=int, help='Model checkpoint interval')
 
+		self.parser.add_argument('--n_mlp', default=8, type=int, help='')
+		self.parser.add_argument('--channel_multiplier', default=2, type=int, help='')
+
 		# arguments for weights & biases support
 		self.parser.add_argument('--use_wandb', action="store_true", help='Whether to use Weights & Biases to track experiment.')
 
