@@ -6,10 +6,10 @@ dataset_paths = {
 	'celeba_train_segmentation': '',
 	'celeba_test_segmentation': '',
 	'ffhq': '',
-	'font_train_modern': '/mnt/data01/pr_img/rendered_chars',
-	'font_test_modern': '/mnt/data01/pr_img/rendered_chars',
-	'font_train_historical': '/mnt/data01/pr_img/char_crops',
-	'font_test_historical': '/mnt/data01/pr_img/char_crops'
+	'font_train_modern': '/content/drive/MyDrive/pr_img/rendered_chars',
+	'font_test_modern': '/content/drive/MyDrive/pr_img/rendered_chars',
+	'font_train_historical': '/content/drive/MyDrive/pr_img/char_crops',
+	'font_test_historical': '/content/drive/MyDrive/pr_img/char_crops'
 }
 
 model_paths = {
@@ -20,5 +20,6 @@ model_paths = {
 	'mtcnn_rnet': 'pretrained_models/mtcnn/rnet.npy',
 	'mtcnn_onet': 'pretrained_models/mtcnn/onet.npy',
 	'shape_predictor': 'shape_predictor_68_face_landmarks.dat',
-	'moco': 'pretrained_models/moco_v2_800ep_pretrain.pth.tar'
+	'moco': 'pretrained_models/moco_v2_800ep_pretrain.pth.tar',
+	'stylegan_font': '/content/drive/MyDrive/stylegan2-ada-training-runs/00000-char_crops_for_stylegan2_ada-auto1/network-snapshot-002000.pkl'
 }
