@@ -31,7 +31,7 @@ class pSp(nn.Module):
 		self.decoder = Generator(self.opts.output_size, 512, 8)
 		self.face_pool = torch.nn.AdaptiveAvgPool2d((256, 256))
 		# Load weights if needed
-		# self.load_weights()
+		self.load_decoder_weights_only() # self.load_weights()
 
 	def set_encoder(self):
 		if self.opts.encoder_type == 'GradualStyleEncoder':
@@ -65,6 +65,16 @@ class pSp(nn.Module):
 				self.__load_latent_avg(ckpt, repeat=1)
 			else:
 				self.__load_latent_avg(ckpt, repeat=self.opts.n_styles)
+
+	def load_decoder_weights_only(self):
+		print('Loading decoder weights from pretrained!')
+		ckpt = torch.load(self.opts.stylegan_weights)
+		self.decoder.load_state_dict(ckpt['g_ema'], strict=False)
+		if self.opts.learn_in_w:
+			self.__load_latent_avg(ckpt, repeat=1)
+		else:
+			self.__load_latent_avg(ckpt, repeat=self.opts.n_styles)
+
 
 	def forward(self, x, resize=True, latent_mask=None, input_code=False, randomize_noise=True,
 	            inject_latent=None, return_latents=False, alpha=None):
