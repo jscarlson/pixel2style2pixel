@@ -6,10 +6,10 @@ dataset_paths = {
 	'celeba_train_segmentation': '',
 	'celeba_test_segmentation': '',
 	'ffhq': '',
-	'font_train_modern': '/content/drive/MyDrive/Japan/font_gen/paired_training_data/pr/labeled_validated_rendered_chars',
-	'font_test_modern': '/content/drive/MyDrive/Japan/font_gen/paired_training_data/pr/labeled_validated_rendered_chars',
-	'font_train_historical': '/content/drive/MyDrive/Japan/font_gen/paired_training_data/pr/labeled_validated_char_crops',
-	'font_test_historical': '/content/drive/MyDrive/Japan/font_gen/paired_training_data/pr/labeled_validated_char_crops'
+	'font_train_modern': '/content/drive/MyDrive/Japan/font_gen/paired_training_data/pr/rendered_chars_for_overfitting',
+	'font_test_modern': '/content/drive/MyDrive/Japan/font_gen/paired_training_data/pr/rendered_chars_for_overfitting',
+	'font_train_historical': '/content/drive/MyDrive/Japan/font_gen/paired_training_data/pr/char_crops_for_overfitting',
+	'font_test_historical': '/content/drive/MyDrive/Japan/font_gen/paired_training_data/pr/char_crops_for_overfitting'
 }
 
 model_paths = {
