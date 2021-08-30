@@ -31,7 +31,7 @@ class pSp(nn.Module):
 		self.decoder = Generator(self.opts.output_size, 512, n_mlp=self.opts.n_mlp, channel_multiplier=self.opts.channel_multiplier)
 		self.face_pool = torch.nn.AdaptiveAvgPool2d((256, 256))
 		# Load weights if needed
-		self.load_decoder_weights_only() # self.load_weights()
+		self.load_weights() # self.load_decoder_weights_only()
 
 	def set_encoder(self):
 		if self.opts.encoder_type == 'GradualStyleEncoder':
