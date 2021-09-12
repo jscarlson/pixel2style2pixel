@@ -6,10 +6,10 @@ dataset_paths = {
 	'celeba_train_segmentation': '',
 	'celeba_test_segmentation': '',
 	'ffhq': '',
-	'font_train_modern': '/content/drive/MyDrive/Japan/font_gen/paired_training_data/pr/rendered_chars_for_overfitting',
-	'font_test_modern': '/content/drive/MyDrive/Japan/font_gen/paired_training_data/pr/rendered_chars_for_overfitting',
-	'font_train_historical': '/content/drive/MyDrive/Japan/font_gen/paired_training_data/pr/char_crops_for_overfitting',
-	'font_test_historical': '/content/drive/MyDrive/Japan/font_gen/paired_training_data/pr/char_crops_for_overfitting'
+	'font_train_modern': '/mnt/data02/Japan/font_gen/paired_training_data/pr/labeled_validated_rendered_chars',
+	'font_test_modern': '/mnt/data02/Japan/font_gen/paired_training_data/pr/rendered_chars_for_overfitting',
+	'font_train_historical': '/mnt/data02/Japan/font_gen/paired_training_data/pr/labeled_validated_char_crops',
+	'font_test_historical': '/mnt/data02/Japan/font_gen/paired_training_data/pr/char_crops_for_overfitting'
 }
 
 model_paths = {
@@ -21,5 +21,5 @@ model_paths = {
 	'mtcnn_onet': 'pretrained_models/mtcnn/onet.npy',
 	'shape_predictor': 'shape_predictor_68_face_landmarks.dat',
 	'moco': '/content/drive/MyDrive/pretrained_models/moco_v2_800ep_pretrain.pt',
-	'stylegan_font': '/content/drive/MyDrive/stylegan2-ada-training-runs/00000-char_crops_for_stylegan2_ada-auto1/network-snapshot-002000.pt'
+	'stylegan_font': '/mnt/workspace/github_repos_japan/stylegan2-pytorch/checkpoint/250000.pt'
 }
