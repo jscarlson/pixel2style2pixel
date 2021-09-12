@@ -14,12 +14,12 @@ dataset_paths = {
 
 model_paths = {
 	'stylegan_ffhq': 'pretrained_models/stylegan2-ffhq-config-f.pt',
-	'ir_se50': '/content/drive/MyDrive/pretrained_models/model_ir_se50.pth',
+	'ir_se50': '/mnt/workspace/pretrained_models/pretrained_models/model_ir_se50.pth',
 	'circular_face': 'pretrained_models/CurricularFace_Backbone.pth',
 	'mtcnn_pnet': 'pretrained_models/mtcnn/pnet.npy',
 	'mtcnn_rnet': 'pretrained_models/mtcnn/rnet.npy',
 	'mtcnn_onet': 'pretrained_models/mtcnn/onet.npy',
 	'shape_predictor': 'shape_predictor_68_face_landmarks.dat',
-	'moco': '/content/drive/MyDrive/pretrained_models/moco_v2_800ep_pretrain.pt',
+	'moco': '/mnt/workspace/pretrained_models/moco_v2_800ep_pretrain.pt',
 	'stylegan_font': '/mnt/workspace/github_repos_japan/stylegan2-pytorch/checkpoint/250000.pt'
 }
