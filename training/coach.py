@@ -45,7 +45,7 @@ class Coach:
 
 		self.mse_loss = nn.MSELoss().to(self.device).eval()
 		if self.opts.lpips_lambda > 0:
-			self.lpips_loss = LPIPS(net_type='vgg').to(self.device).eval()
+			self.lpips_loss = LPIPS(net_type=self.opts.lpips_type).to(self.device).eval()
 		if self.opts.id_lambda > 0:
 			self.id_loss = id_loss.IDLoss().to(self.device).eval()
 		if self.opts.w_norm_lambda > 0:
