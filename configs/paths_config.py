@@ -10,8 +10,8 @@ dataset_paths = {
 	'font_test_modern': '/mnt/data02/Japan/font_gen/paired_training_data/pr/rendered_chars_for_overfitting',
 	'font_train_historical': '/mnt/data02/Japan/font_gen/paired_training_data/pr/labeled_validated_char_crops',
 	'font_test_historical': '/mnt/data02/Japan/font_gen/paired_training_data/pr/char_crops_for_overfitting',
-	'font_train_inversion': '/mnt/data01/AWS_S3_CONTAINER/personnel-records/1956/seg/firm/stylegan2_crops/pr',
-	'font_test_inversion': '/mnt/data01/AWS_S3_CONTAINER/personnel-records/1956/seg/firm/stylegan2_crops_sample/pr/'
+	'font_train_inversion': '/mnt/data02/Japan/font_gen/paired_training_data/pr/char_crops_for_overfitting', # '/mnt/data01/AWS_S3_CONTAINER/personnel-records/1956/seg/firm/stylegan2_crops/pr',
+	'font_test_inversion': '/mnt/data02/Japan/font_gen/paired_training_data/pr/char_crops_for_overfitting' # '/mnt/data01/AWS_S3_CONTAINER/personnel-records/1956/seg/firm/stylegan2_crops_sample/pr/'
 }
 
 model_paths = {
