@@ -107,8 +107,6 @@ class pSp(nn.Module):
 		                                     randomize_noise=randomize_noise,
 		                                     return_latents=return_latents)
 
-		print(images.size())
-
 		if resize:
 			images = self.face_pool(images)
 
