@@ -30,7 +30,7 @@ class WBLogger:
 
     @staticmethod
     def log_images_to_wandb(x, y, y_hat, id_logs, prefix, step, opts):
-        if step % 500 == 0:
+        if step % 500 == 0 or prefix == "train":
             print(step, end="****\n")
             im_data = []
             column_names = ["Source", "Target", "Output"]
