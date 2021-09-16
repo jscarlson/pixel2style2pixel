@@ -52,4 +52,11 @@ DATASETS = {
 		'test_source_root': dataset_paths['font_test_inversion'],
 		'test_target_root': dataset_paths['font_test_inversion'],
 	},
+	'font_colorize': {
+		'transforms': transforms_config.FontTransforms,
+		'train_source_root': dataset_paths['font_train_grayscale'],
+		'train_target_root': dataset_paths['font_train_inversion'],
+		'test_source_root': dataset_paths['font_test_grayscale'],
+		'test_target_root': dataset_paths['font_test_inversion'],
+	},
 }
