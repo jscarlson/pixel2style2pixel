@@ -52,7 +52,7 @@ def run():
 	                           opts=opts)
 	dataloader = DataLoader(dataset,
 	                        batch_size=opts.test_batch_size,
-	                        shuffle=False,
+	                        shuffle=True,
 	                        num_workers=int(opts.test_workers),
 	                        drop_last=True)
 
