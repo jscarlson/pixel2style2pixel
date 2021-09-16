@@ -90,8 +90,6 @@ class pSp(nn.Module):
 				else:
 					codes = codes + self.latent_avg.repeat(codes.shape[0], 1, 1)
 
-		print(codes.size())
-
 		if latent_mask is not None:
 			for i in latent_mask:
 				if inject_latent is not None:
