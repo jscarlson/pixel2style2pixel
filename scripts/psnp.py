@@ -82,10 +82,16 @@ def main():
 
             result_batch, result_latents = run_on_batch(input_cuda, net, opts)
 
-            latent_array = result_latents.cpu().detach().numpy().astype('float32')
-            latents_save_path = os.path.join(out_path_latents, f'{global_i}.npy')
-            with open(latents_save_path, 'wb') as f:
-                np.save(f, latent_array)
+            if opts.faiss_dir is not None:
+                closest_latents_array = run_faiss(result_latents, opts)
+                closest_input_cuda = closest_latents_array.cuda().float()
+                result_batch, _ = run_on_batch(closest_input_cuda, net, opts, input_code=True)
+
+            else:
+                latent_array = result_latents.cpu().detach().numpy().astype('float32')
+                latents_save_path = os.path.join(out_path_latents, f'{global_i}.npy')
+                with open(latents_save_path, 'wb') as f:
+                    np.save(f, latent_array)
 
             toc = time.time()
             global_time.append(toc - tic)
@@ -96,7 +102,6 @@ def main():
             im_path = input_paths[i]
 
             if opts.couple_outputs:
-
                 input_im = log_input_image(input_batch[i], opts)
                 resize_amount = (256, 256) if opts.resize_outputs else (opts.output_size, opts.output_size)
                 res = np.concatenate(
@@ -116,12 +121,8 @@ def main():
     with open(stats_path, 'w') as f:
         f.write(result_str)
 
-    # latents similarity search
-    if opts.faiss_dir is not None:
-        run_faiss(opts)
 
-
-def run_faiss(opts, first_n_latents=2, dim=1024, n_nn=4):
+def run_faiss(query_latents, opts, dim=1024, n_nn=4):
 
     # create index
     index = faiss.IndexFlatL2(dim)
@@ -132,21 +133,31 @@ def run_faiss(opts, first_n_latents=2, dim=1024, n_nn=4):
             if name.endswith('.npy'):
                 with open(os.path.join(root, name), 'rb') as f:
                     saved_latents = np.load(f)
-                    reshaped_latents = np.ascontiguousarray(
-                        saved_latents[:,:first_n_latents,:].\
-                            reshape((saved_latents.shape[0], -1))
-                    )
-                    assert reshaped_latents.shape[1] == dim
+                    reshaped_latents = reshape_latent(saved_latents)
                     index.add(reshaped_latents)
     print(f'Total indices {index.ntotal}')
 
-    # search index                 
-    D, I = index.search(reshaped_latents, n_nn) 
-    print(I)
-    print(D)          
+    # search index
+    reshaped_query_latents = reshape_latent(query_latents)
+    query_size = reshaped_query_latents.shape[0]
+    D, I = index.search(reshaped_query_latents, n_nn) 
+
+    # return closest
+    vecs = np.zeros((query_size, dim))
+    closest_indices = np.apply_along_axis(lambda x: x[0], axis=1, arr=I)
+    for i, val in enumerate(closest_indices.tolist()):
+        vecs[i, :] = index.reconstruct(val)
+    
+    return vecs
 
 
-def run_on_batch(inputs, net, opts):
+def reshape_latent(latents, first_n_latents=2):
+    return np.ascontiguousarray(
+        latents[:,:first_n_latents,:].reshape((latents.shape[0], -1))
+    )
+
+
+def run_on_batch(inputs, net, opts, input_code=False):
 
     # No style mixing inference
     if opts.latent_mask is None:
@@ -155,7 +166,8 @@ def run_on_batch(inputs, net, opts):
             inputs, 
             randomize_noise=False, 
             resize=opts.resize_outputs, 
-            return_latents=True
+            return_latents=True,
+            input_code=input_code,
         )
 
     else:
