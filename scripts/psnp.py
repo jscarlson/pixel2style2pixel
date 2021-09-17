@@ -69,6 +69,10 @@ def main():
     global_i = 0
     global_time = []
 
+    # faiss index creation
+    if opts.faiss_dir is not None:
+        index, lookup_arrays = setup_faiss()
+
     # inference
     for input_batch, input_paths in tqdm(dataloader):
 
@@ -83,9 +87,8 @@ def main():
             result_batch, result_latents = run_on_batch(input_cuda, net, opts)
 
             if opts.faiss_dir is not None:
-                closest_latents_array = run_faiss(result_latents, opts)
+                closest_latents_array = run_faiss(result_latents, index, lookup_arrays)
                 closest_input_cuda = torch.from_numpy(closest_latents_array).cuda().float()
-                print(closest_input_cuda.size())
                 result_batch, _ = run_on_batch(closest_input_cuda, net, opts, input_code=True)
 
             else:
@@ -123,11 +126,11 @@ def main():
         f.write(result_str)
 
 
-def run_faiss(query_latents, opts, dim=1024, n_nn=4):
+def setup_faiss(opts, dim=512, first_n_latents=2):
 
     # create index
-    index = faiss.IndexFlatL2(dim)
-    all_arrays = np.empty((0, 10, 512), dtype=np.float32)
+    index = faiss.IndexFlatL2(dim*first_n_latents)
+    all_arrays = np.empty((0, 10, dim), dtype=np.float32)
 
     # load index
     for root, dirs, files in os.walk(opts.faiss_dir):
@@ -140,18 +143,21 @@ def run_faiss(query_latents, opts, dim=1024, n_nn=4):
                     index.add(reshaped_latents)
     print(f'Total indices {index.ntotal}')
 
+    return index, all_arrays
+
+
+def run_faiss(query_latents, index, all_arrays, n_nn=4):
+    
     # search index
     reshaped_query_latents = reshape_latent(query_latents)
-    query_size = reshaped_query_latents.shape[0]
     D, I = index.search(reshaped_query_latents, n_nn) 
 
     # return closest
-    vecs = np.zeros((query_size, dim))
     closest_indices = np.apply_along_axis(lambda x: x[0], axis=1, arr=I)
     return all_arrays[closest_indices.tolist(),:,:]
 
 
-def reshape_latent(latents, first_n_latents=2):
+def reshape_latent(latents, first_n_latents):
     if torch.is_tensor(latents):
         latents = latents.cpu().detach().numpy()
     return np.ascontiguousarray(
