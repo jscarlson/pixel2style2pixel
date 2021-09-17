@@ -152,6 +152,8 @@ def run_faiss(query_latents, opts, dim=1024, n_nn=4):
 
 
 def reshape_latent(latents, first_n_latents=2):
+    if torch.is_tensor(latents):
+        latents = latents.cpu().detach().numpy()
     return np.ascontiguousarray(
         latents[:,:first_n_latents,:].reshape((latents.shape[0], -1))
     )
