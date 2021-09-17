@@ -82,7 +82,7 @@ def main():
 
             result_batch, result_latents = run_on_batch(input_cuda, net, opts)
 
-            latent_array = result_latents.cpu().detach().numpy()
+            latent_array = result_latents.cpu().detach().numpy(dtype=np.float32)
             latents_save_path = os.path.join(out_path_latents, f'{global_i}.npy')
             with open(latents_save_path, 'wb') as f:
                 np.save(f, latent_array)
