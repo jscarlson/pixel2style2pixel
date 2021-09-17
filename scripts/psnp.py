@@ -71,7 +71,7 @@ def main():
 
     # faiss index creation
     if opts.faiss_dir is not None:
-        index, lookup_arrays = setup_faiss()
+        index, lookup_arrays = setup_faiss(opts)
 
     # inference
     for input_batch, input_paths in tqdm(dataloader):
