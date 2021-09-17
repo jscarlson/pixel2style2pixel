@@ -139,17 +139,17 @@ def setup_faiss(opts, dim=512, first_n_latents=2):
                 with open(os.path.join(root, name), 'rb') as f:
                     saved_latents = np.load(f)
                     all_arrays = np.concatenate([all_arrays, saved_latents], axis=0)
-                    reshaped_latents = reshape_latent(saved_latents)
+                    reshaped_latents = reshape_latent(saved_latents, first_n_latents)
                     index.add(reshaped_latents)
     print(f'Total indices {index.ntotal}')
 
     return index, all_arrays
 
 
-def run_faiss(query_latents, index, all_arrays, n_nn=4):
+def run_faiss(query_latents, index, all_arrays, first_n_latents=2, n_nn=4):
     
     # search index
-    reshaped_query_latents = reshape_latent(query_latents)
+    reshaped_query_latents = reshape_latent(query_latents, first_n_latents)
     D, I = index.search(reshaped_query_latents, n_nn) 
 
     # return closest
