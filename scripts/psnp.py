@@ -81,16 +81,10 @@ def main():
 
             result_batch, result_latents = run_on_batch(input_cuda, net, opts)
 
-            for i in range(opts.test_batch_size):
-                latent_tensor = result_latents[i,:,:].squeeze(0) # e.g. size 4x10x512
-                latent_array = latent_tensor.cpu().detach().numpy()
-                im_path = input_paths[i]
-                latents_save_path = os.path.join(
-                    out_path_latents, 
-                    os.path.basename(im_path).split('.')[0] + '.npy'
-                )
-                with open(latents_save_path, 'wb') as f:
-                    np.save(f, latent_array)
+            latent_array = result_latents.cpu().detach().numpy()
+            latents_save_path = os.path.join(out_path_latents, f'{global_i}.npy')
+            with open(latents_save_path, 'wb') as f:
+                np.save(f, latent_array)
 
             toc = time.time()
             global_time.append(toc - tic)
