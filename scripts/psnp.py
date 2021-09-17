@@ -133,6 +133,8 @@ def main():
                         saved_latents = np.load(f)
                         reshaped_latents = saved_latents[:,:FIRST_N_LATENTS,:].\
                             reshape((saved_latents.shape[0], -1))
+                        print(reshaped_latents.shape)
+                        print(reshaped_latents.flags)
                         assert reshaped_latents.shape[1] == DIM
                         index.add(reshaped_latents)
 
