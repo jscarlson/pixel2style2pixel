@@ -85,6 +85,7 @@ def main():
             if opts.faiss_dir is not None:
                 closest_latents_array = run_faiss(result_latents, opts)
                 closest_input_cuda = torch.from_numpy(closest_latents_array).cuda().float()
+                print(closest_input_cuda.size())
                 result_batch, _ = run_on_batch(closest_input_cuda, net, opts, input_code=True)
 
             else:
@@ -126,6 +127,7 @@ def run_faiss(query_latents, opts, dim=1024, n_nn=4):
 
     # create index
     index = faiss.IndexFlatL2(dim)
+    all_arrays = np.array([])
 
     # load index
     for root, dirs, files in os.walk(opts.faiss_dir):
@@ -133,6 +135,7 @@ def run_faiss(query_latents, opts, dim=1024, n_nn=4):
             if name.endswith('.npy'):
                 with open(os.path.join(root, name), 'rb') as f:
                     saved_latents = np.load(f)
+                    all_arrays = np.concatenate([all_arrays, saved_latents], axis=0)
                     reshaped_latents = reshape_latent(saved_latents)
                     index.add(reshaped_latents)
     print(f'Total indices {index.ntotal}')
@@ -145,10 +148,7 @@ def run_faiss(query_latents, opts, dim=1024, n_nn=4):
     # return closest
     vecs = np.zeros((query_size, dim))
     closest_indices = np.apply_along_axis(lambda x: x[0], axis=1, arr=I)
-    for i, val in enumerate(closest_indices.tolist()):
-        vecs[i, :] = index.reconstruct(val)
-    
-    return vecs
+    return all_arrays[closest_indices.tolist(),:,:]
 
 
 def reshape_latent(latents, first_n_latents=2):
