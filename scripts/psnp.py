@@ -118,33 +118,32 @@ def main():
 
     # latents similarity search
     if opts.faiss_dir is not None:
+        run_faiss(opts)
 
-        # create index
-        FIRST_N_LATENTS = 2
-        DIM = 1024
-        index = faiss.IndexFlatL2(DIM)
-        print(index.is_trained)
 
-        # load index
-        for root, dirs, files in os.walk(opts.faiss_dir):
-            for name in files:
-                if name.endswith('.npy'):
-                    with open(os.path.join(root, name), 'rb') as f:
-                        saved_latents = np.load(f)
-                        reshaped_latents = np.ascontiguousarray(
-                            saved_latents[:,:FIRST_N_LATENTS,:].\
-                                reshape((saved_latents.shape[0], -1))
-                        )
-                        assert reshaped_latents.shape[1] == DIM
-                        index.add(reshaped_latents)
+def run_faiss(opts, first_n_latents=2, dim=1024, n_nn=4):
 
-        print(index.ntotal)
+    # create index
+    index = faiss.IndexFlatL2(dim)
 
-        # search index
-        k = 4                                    # we want to see 4 nearest neighbors
-        D, I = index.search(reshaped_latents, k) # sanity check
-        print(I)
-        print(D)          
+    # load index
+    for root, dirs, files in os.walk(opts.faiss_dir):
+        for name in files:
+            if name.endswith('.npy'):
+                with open(os.path.join(root, name), 'rb') as f:
+                    saved_latents = np.load(f)
+                    reshaped_latents = np.ascontiguousarray(
+                        saved_latents[:,:first_n_latents,:].\
+                            reshape((saved_latents.shape[0], -1))
+                    )
+                    assert reshaped_latents.shape[1] == dim
+                    index.add(reshaped_latents)
+    print(f'Total indices {index.ntotal}')
+
+    # search index                 
+    D, I = index.search(reshaped_latents, n_nn) 
+    print(I)
+    print(D)          
 
 
 def run_on_batch(inputs, net, opts):
