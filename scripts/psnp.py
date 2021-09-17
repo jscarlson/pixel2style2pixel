@@ -8,6 +8,7 @@ import torch
 from PIL import Image
 from torch.utils.data import DataLoader
 import sys
+import faiss
 
 sys.path.append(".")
 sys.path.append("..")
@@ -114,6 +115,32 @@ def main():
     print(result_str)
     with open(stats_path, 'w') as f:
         f.write(result_str)
+
+    # latents similarity search
+    if opts.faiss_dir is not None:
+
+        # create index
+        FIRST_N_LATENTS = 2
+        index = faiss.IndexFlatL2(512)
+        print(index.is_trained)
+
+        # load index
+        for root, dirs, files in os.walk(opts.faiss_dir):
+            for name in files:
+                if name.endswith('.npy'):
+                    with open(os.path.join(root, name), 'rb') as f:
+                        saved_latents = np.load(f)
+                        reshaped_latents = saved_latents[:,:FIRST_N_LATENTS,:].\
+                            reshape((saved_latents.shape[0], -1))
+                        index.add(reshaped_latents)
+
+        print(index.ntotal)
+
+        # search index
+        k = 4                                    # we want to see 4 nearest neighbors
+        D, I = index.search(reshaped_latents, k) # sanity check
+        print(I)
+        print(D)          
 
 
 def run_on_batch(inputs, net, opts):
