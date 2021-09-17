@@ -28,6 +28,7 @@ def main():
     out_path_coupled = os.path.join(test_opts.exp_dir, 'inference_coupled')
     os.makedirs(out_path_results, exist_ok=True)
     os.makedirs(out_path_coupled, exist_ok=True)
+    os.makedirs(out_path_latents, exist_ok=True)
 
     # update test options with options used during training
     ckpt = torch.load(test_opts.checkpoint_path, map_location='cpu')
@@ -79,10 +80,9 @@ def main():
             tic = time.time()
 
             result_batch, result_latents = run_on_batch(input_cuda, net, opts)
-            print(result_latents.size())
 
             for i in range(opts.test_batch_size):
-                latent_tensor = result_latents[:,i]
+                latent_tensor = result_latents[i,:,:]
                 im_path = input_paths[i]
                 latents_save_path = os.path.join(
                     out_path_latents, 
