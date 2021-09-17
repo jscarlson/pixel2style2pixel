@@ -127,7 +127,7 @@ def run_faiss(query_latents, opts, dim=1024, n_nn=4):
 
     # create index
     index = faiss.IndexFlatL2(dim)
-    all_arrays = np.empty((0, 10, dim), dtype=np.float32)
+    all_arrays = np.empty((0, 10, 512), dtype=np.float32)
 
     # load index
     for root, dirs, files in os.walk(opts.faiss_dir):
