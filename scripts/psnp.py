@@ -83,7 +83,7 @@ def main():
 
             for i in range(opts.test_batch_size):
                 latent_tensor = result_latents[i,:,:].squeeze(0) # e.g. size 4x10x512
-                latent_array = latent_tensor.detach().numpy()
+                latent_array = latent_tensor.cpu().detach().numpy()
                 im_path = input_paths[i]
                 latents_save_path = os.path.join(
                     out_path_latents, 
