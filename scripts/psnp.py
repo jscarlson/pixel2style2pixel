@@ -121,7 +121,8 @@ def main():
 
         # create index
         FIRST_N_LATENTS = 2
-        index = faiss.IndexFlatL2(512)
+        DIM = 1024
+        index = faiss.IndexFlatL2(DIM)
         print(index.is_trained)
 
         # load index
@@ -132,6 +133,7 @@ def main():
                         saved_latents = np.load(f)
                         reshaped_latents = saved_latents[:,:FIRST_N_LATENTS,:].\
                             reshape((saved_latents.shape[0], -1))
+                        assert reshaped_latents.shape[1] == DIM
                         index.add(reshaped_latents)
 
         print(index.ntotal)
