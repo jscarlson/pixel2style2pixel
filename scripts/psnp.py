@@ -131,7 +131,8 @@ def main():
                 if name.endswith('.npy'):
                     with open(os.path.join(root, name), 'rb') as f:
                         saved_latents = np.load(f)
-                        reshaped_latents = saved_latents[:,:FIRST_N_LATENTS,:].\
+                        print(saved_latents.flags)
+                        reshaped_latents = saved_latents.\
                             reshape((saved_latents.shape[0], -1))
                         print(reshaped_latents.shape)
                         print(reshaped_latents.flags)
