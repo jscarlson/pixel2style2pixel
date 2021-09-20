@@ -152,6 +152,7 @@ def setup_faiss(opts, dim=512, n_latents=2):
                 saved_latents = np.load(os.path.join(root, name))
                 all_arrays = np.concatenate([all_arrays, saved_latents], axis=0)
                 reshaped_latents = reshape_latent(saved_latents, n_latents)
+                faiss.normalize_L2(reshaped_latents)
                 index.add(reshaped_latents)
     print(f'Total indices {index.ntotal}')
 
