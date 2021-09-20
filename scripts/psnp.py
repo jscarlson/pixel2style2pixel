@@ -157,11 +157,13 @@ def setup_faiss(opts, dim=512, first_n_latents=2):
     return index, all_arrays
 
 
-def run_faiss(query_latents, index, all_arrays, first_n_latents=2, n_nn=4):
+def run_faiss(query_latents, index, all_arrays, first_n_latents=2, n_nn=4, verbose=True):
     
     # search index
     reshaped_query_latents = reshape_latent(query_latents, first_n_latents)
-    D, I = index.search(reshaped_query_latents, n_nn) 
+    D, I = index.search(reshaped_query_latents, n_nn)
+    if verbose:
+        print(I)
 
     # return closest
     closest_indices = np.apply_along_axis(lambda x: x[0], axis=1, arr=I)
