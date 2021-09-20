@@ -135,7 +135,7 @@ def setup_faiss(opts, dim=512, first_n_latents=2):
 
     # load index
     for root, dirs, files in tqdm(os.walk(opts.faiss_dir)):
-        for name in files:
+        for name in tqdm(files, position=0, leave=True):
             if name.endswith('.npy'):
                 with open(os.path.join(root, name), 'rb') as f:
                     saved_latents = np.load(f)
