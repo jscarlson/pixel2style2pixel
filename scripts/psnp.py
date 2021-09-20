@@ -57,8 +57,7 @@ def main():
         dataset,
         batch_size=opts.test_batch_size,
         shuffle=True,
-        num_workers=int(opts.test_workers),
-        drop_last=True
+        num_workers=int(opts.test_workers)
     )
 
     # n images to generate
@@ -135,7 +134,7 @@ def setup_faiss(opts, dim=512, first_n_latents=2):
     all_arrays = np.empty((0, 10, dim), dtype=np.float32)
 
     # load index
-    for root, dirs, files in os.walk(opts.faiss_dir):
+    for root, dirs, files in tqdm(os.walk(opts.faiss_dir)):
         for name in files:
             if name.endswith('.npy'):
                 with open(os.path.join(root, name), 'rb') as f:
