@@ -38,6 +38,8 @@ def main():
     opts.update(vars(test_opts))
     if 'learn_in_w' not in opts:
         opts['learn_in_w'] = False
+    if not opts['save_latents']:
+        opts['start_from_latent_avg'] = False
     print(opts)
     opts = Namespace(**opts)
 
