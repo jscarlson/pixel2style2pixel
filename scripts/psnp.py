@@ -96,14 +96,30 @@ def main():
                 
             else:
                 
-                closest_latents_array = run_faiss(result_latents, index, lookup_arrays, n_latents=opts.n_latents, n_neighbors=3)
-                closest_input_cuda = torch.from_numpy(closest_latents_array).cuda().float()
-                result_batch, _ = run_on_batch(closest_input_cuda, net, opts, input_code=True)
+                closest_latents = run_faiss(
+                    result_latents, 
+                    index, 
+                    lookup_arrays, 
+                    n_latents=opts.n_latents, 
+                    n_neighbors=opts.n_neighbors
+                )
+
+                for bidx, clatent in enumerate(closest_latents):
+
+                    closest_input_cuda = torch.from_numpy(clatent).cuda().float()
+                    result_neighbors, _ = run_on_batch(closest_input_cuda, net, opts, input_code=True)
+
+                    im_path = input_paths[bidx]
+                    input_im = log_input_image(input_batch[bidx], opts)
+                    res = [np.array(input_im)]
+                    res = res + [np.array(tensor2im(result_neighbors[i])) for i in range(opts.n_neighbors)]
+                    res = np.concatenate(res, axis=1)
+                    Image.fromarray(res).save(os.path.join(out_path_coupled, os.path.basename(im_path)))
 
             toc = time.time()
             global_time.append(toc - tic)
 
-        if opts.save_images:
+        if opts.save_images and opts.save_latents:
 
             for i in range(opts.test_batch_size):
 
@@ -169,11 +185,9 @@ def run_faiss(query_latents, index, all_arrays, n_latents, n_neighbors=5, verbos
 
     # return closest
     closest_indices = np.apply_along_axis(lambda x: x[:n_neighbors], axis=1, arr=I)
-    print(closest_indices.tolist())
+    closest_codes = [all_arrays[cidx,:,:] for cidx in closest_indices]
 
-    exit(1)
-
-    return all_arrays[closest_indices.tolist(),:,:]
+    return closest_codes
 
 
 def reshape_latent(latents, n_latents):
