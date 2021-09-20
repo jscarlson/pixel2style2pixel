@@ -96,7 +96,7 @@ def main():
                 
             else:
                 
-                closest_latents_array = run_faiss(result_latents, index, lookup_arrays, first_n_latents=1)
+                closest_latents_array = run_faiss(result_latents, index, lookup_arrays, n_latents=10)
                 closest_input_cuda = torch.from_numpy(closest_latents_array).cuda().float()
                 result_batch, _ = run_on_batch(closest_input_cuda, net, opts, input_code=True)
 
@@ -138,10 +138,10 @@ def main():
         f.write(result_str)
 
 
-def setup_faiss(opts, dim=512, first_n_latents=2):
+def setup_faiss(opts, dim=512, n_latents=2):
 
     # create index
-    index = faiss.IndexFlatL2(dim*first_n_latents)
+    index = faiss.IndexFlatIP(dim*n_latents)
     all_arrays = np.empty((0, 10, dim), dtype=np.float32)
 
     # load index
@@ -150,17 +150,17 @@ def setup_faiss(opts, dim=512, first_n_latents=2):
             if name.endswith('.npy'):
                 saved_latents = np.load(os.path.join(root, name))
                 all_arrays = np.concatenate([all_arrays, saved_latents], axis=0)
-                reshaped_latents = reshape_latent(saved_latents, first_n_latents)
+                reshaped_latents = reshape_latent(saved_latents, n_latents)
                 index.add(reshaped_latents)
     print(f'Total indices {index.ntotal}')
 
     return index, all_arrays
 
 
-def run_faiss(query_latents, index, all_arrays, first_n_latents=2, n_nn=4, verbose=True):
+def run_faiss(query_latents, index, all_arrays, n_latents=2, n_nn=4, verbose=True):
     
     # search index
-    reshaped_query_latents = reshape_latent(query_latents, first_n_latents)
+    reshaped_query_latents = reshape_latent(query_latents, n_latents)
     D, I = index.search(reshaped_query_latents, n_nn)
     if verbose:
         print(I)
@@ -171,11 +171,11 @@ def run_faiss(query_latents, index, all_arrays, first_n_latents=2, n_nn=4, verbo
     return all_arrays[closest_indices.tolist(),:,:]
 
 
-def reshape_latent(latents, first_n_latents):
+def reshape_latent(latents, n_latents):
     if torch.is_tensor(latents):
         latents = latents.cpu().detach().numpy()
     return np.ascontiguousarray(
-        latents[:,:first_n_latents,:].reshape((latents.shape[0], -1))
+        latents[:,:n_latents,:].reshape((latents.shape[0], -1))
     )
 
 
