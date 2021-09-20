@@ -164,6 +164,7 @@ def run_faiss(query_latents, index, all_arrays, first_n_latents=2, n_nn=4, verbo
     D, I = index.search(reshaped_query_latents, n_nn)
     if verbose:
         print(I)
+        print(D)
 
     # return closest
     closest_indices = np.apply_along_axis(lambda x: x[0], axis=1, arr=I)
