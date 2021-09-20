@@ -25,8 +25,8 @@ def main():
     # path setup
     test_opts = TestOptions().parse()
     out_path_results = os.path.join(test_opts.exp_dir, 'inference_results')
-    out_path_latents = os.path.join(test_opts.exp_dir, 'inference_latents')
     out_path_coupled = os.path.join(test_opts.exp_dir, 'inference_coupled')
+    out_path_latents = os.path.join(test_opts.faiss_dir, 'inference_latents')
     os.makedirs(out_path_results, exist_ok=True)
     os.makedirs(out_path_coupled, exist_ok=True)
     os.makedirs(out_path_latents, exist_ok=True)
@@ -70,7 +70,7 @@ def main():
     global_time = []
 
     # faiss index creation
-    if opts.faiss_dir is not None:
+    if not opts.save_latents:
         index, lookup_arrays = setup_faiss(opts)
 
     # inference
@@ -86,7 +86,7 @@ def main():
 
             result_batch, result_latents = run_on_batch(input_cuda, net, opts)
 
-            if opts.faiss_dir is not None:
+            if not opts.save_latents:
                 closest_latents_array = run_faiss(result_latents, index, lookup_arrays)
                 closest_input_cuda = torch.from_numpy(closest_latents_array).cuda().float()
                 result_batch, _ = run_on_batch(closest_input_cuda, net, opts, input_code=True)
@@ -100,23 +100,25 @@ def main():
             toc = time.time()
             global_time.append(toc - tic)
 
-        for i in range(opts.test_batch_size):
+        if opts.save_images:
 
-            result = tensor2im(result_batch[i])
-            im_path = input_paths[i]
+            for i in range(opts.test_batch_size):
 
-            if opts.couple_outputs:
-                input_im = log_input_image(input_batch[i], opts)
-                resize_amount = (256, 256) if opts.resize_outputs else (opts.output_size, opts.output_size)
-                res = np.concatenate(
-                    [np.array(input_im.resize(resize_amount)),
-                    np.array(result.resize(resize_amount))], axis=1)
-                Image.fromarray(res).save(os.path.join(out_path_coupled, os.path.basename(im_path)))
+                result = tensor2im(result_batch[i])
+                im_path = input_paths[i]
 
-            im_save_path = os.path.join(out_path_results, os.path.basename(im_path))
-            Image.fromarray(np.array(result)).save(im_save_path)
+                if opts.couple_outputs:
+                    input_im = log_input_image(input_batch[i], opts)
+                    resize_amount = (256, 256) if opts.resize_outputs else (opts.output_size, opts.output_size)
+                    res = np.concatenate(
+                        [np.array(input_im.resize(resize_amount)),
+                        np.array(result.resize(resize_amount))], axis=1)
+                    Image.fromarray(res).save(os.path.join(out_path_coupled, os.path.basename(im_path)))
 
-            global_i += 1
+                im_save_path = os.path.join(out_path_results, os.path.basename(im_path))
+                Image.fromarray(np.array(result)).save(im_save_path)
+
+        global_i += opts.test_batch_size
 
     # create stats
     stats_path = os.path.join(opts.exp_dir, 'stats.txt')
