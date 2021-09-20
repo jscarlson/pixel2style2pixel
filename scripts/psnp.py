@@ -44,7 +44,6 @@ def main():
     net = pSp(opts)
     net.eval()
     net.cuda()
-    N_LATENTS = 5
 
     # dataset setup
     print('Loading dataset for {}'.format(opts.dataset_type))
@@ -97,7 +96,7 @@ def main():
                 
             else:
                 
-                closest_latents_array = run_faiss(result_latents, index, lookup_arrays, n_latents=N_LATENTS)
+                closest_latents_array = run_faiss(result_latents, index, lookup_arrays, n_latents=opts.n_latents)
                 closest_input_cuda = torch.from_numpy(closest_latents_array).cuda().float()
                 result_batch, _ = run_on_batch(closest_input_cuda, net, opts, input_code=True)
 
@@ -126,7 +125,7 @@ def main():
 
     # faiss index creation
     if opts.save_latents:
-        index, lookup_arrays = setup_faiss(opts, n_latents=N_LATENTS)
+        index, lookup_arrays = setup_faiss(opts, n_latents=opts.n_latents)
         faiss.write_index(index, os.path.join(opts.faiss_dir, 'index.bin'))
         with open(os.path.join(opts.faiss_dir, 'lookup_array.npy'), 'wb') as f:
             np.save(f, lookup_arrays)
