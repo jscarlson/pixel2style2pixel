@@ -44,7 +44,7 @@ def main():
     net = pSp(opts)
     net.eval()
     net.cuda()
-    N_LATENTS = 2
+    N_LATENTS = 5
 
     # dataset setup
     print('Loading dataset for {}'.format(opts.dataset_type))
