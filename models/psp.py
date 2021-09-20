@@ -101,7 +101,7 @@ class pSp(nn.Module):
 					codes[:, i] = 0
 
 		images, result_latent = self.decoder([codes],
-		                                     input_is_latent=input_code,
+		                                     input_is_latent=True,
 		                                     randomize_noise=randomize_noise,
 		                                     return_latents=return_latents)
 
