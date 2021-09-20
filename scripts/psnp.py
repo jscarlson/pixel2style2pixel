@@ -38,6 +38,7 @@ def main():
     opts.update(vars(test_opts))
     if 'learn_in_w' not in opts:
         opts['learn_in_w'] = False
+    print(opts)
     opts = Namespace(**opts)
 
     # model setup
@@ -126,7 +127,7 @@ def main():
     # faiss index creation
     if opts.save_latents:
         index, lookup_arrays = setup_faiss(opts)
-        faiss.write_index(index, os.path.join(opts.faiss_dir, "index.bin"))
+        faiss.write_index(index, os.path.join(opts.faiss_dir, 'index.bin'))
         with open(os.path.join(opts.faiss_dir, 'lookup_array.npy'), 'wb') as f:
             np.save(f, lookup_arrays)
         
