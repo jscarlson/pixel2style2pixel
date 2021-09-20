@@ -96,7 +96,7 @@ def main():
                 
             else:
                 
-                closest_latents_array = run_faiss(result_latents, index, lookup_arrays, n_latents=opts.n_latents)
+                closest_latents_array = run_faiss(result_latents, index, lookup_arrays, n_latents=opts.n_latents, n_neighbors=3)
                 closest_input_cuda = torch.from_numpy(closest_latents_array).cuda().float()
                 result_batch, _ = run_on_batch(closest_input_cuda, net, opts, input_code=True)
 
@@ -138,7 +138,7 @@ def main():
         f.write(result_str)
 
 
-def setup_faiss(opts, dim=512, n_latents=2):
+def setup_faiss(opts, n_latents, dim=512):
 
     # create index
     index = faiss.IndexFlatIP(dim*n_latents)
@@ -158,17 +158,21 @@ def setup_faiss(opts, dim=512, n_latents=2):
     return index, all_arrays
 
 
-def run_faiss(query_latents, index, all_arrays, n_latents=2, n_nn=4, verbose=True):
+def run_faiss(query_latents, index, all_arrays, n_latents, n_neighbors=5, verbose=True):
     
     # search index
     reshaped_query_latents = reshape_latent(query_latents, n_latents)
-    D, I = index.search(reshaped_query_latents, n_nn)
+    D, I = index.search(reshaped_query_latents, n_neighbors)
     if verbose:
         print(I)
         print(D)
 
     # return closest
-    closest_indices = np.apply_along_axis(lambda x: x[0], axis=1, arr=I)
+    closest_indices = np.apply_along_axis(lambda x: x[:n_neighbors], axis=1, arr=I)
+    print(closest_indices.tolist())
+
+    exit(1)
+
     return all_arrays[closest_indices.tolist(),:,:]
 
 
