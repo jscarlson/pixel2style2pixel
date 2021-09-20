@@ -96,7 +96,7 @@ def main():
                 
             else:
                 
-                closest_latents_array = run_faiss(result_latents, index, lookup_arrays)
+                closest_latents_array = run_faiss(result_latents, index, lookup_arrays, first_n_latents=1)
                 closest_input_cuda = torch.from_numpy(closest_latents_array).cuda().float()
                 result_batch, _ = run_on_batch(closest_input_cuda, net, opts, input_code=True)
 
