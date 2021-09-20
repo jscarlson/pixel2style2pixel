@@ -9,6 +9,7 @@ from PIL import Image
 from torch.utils.data import DataLoader
 import sys
 import faiss
+from numpy.lib.format import open_memmap
 
 sys.path.append(".")
 sys.path.append("..")
@@ -68,10 +69,11 @@ def main():
     global_i = 0
     global_time = []
 
-    # faiss index creation
+    # read in latents
     if not opts.save_latents:
-        index, lookup_arrays = setup_faiss(opts)
-
+        index = faiss.read_index(os.path.join(opts.faiss_dir, 'index.bin'))
+        lookup_arrays = np.load(os.path.join(opts.faiss_dir, 'lookup_array.npy'), mmap_mode='r')
+        
     # inference
     for input_batch, input_paths in tqdm(dataloader):
 
@@ -85,16 +87,18 @@ def main():
 
             result_batch, result_latents = run_on_batch(input_cuda, net, opts)
 
-            if not opts.save_latents:
-                closest_latents_array = run_faiss(result_latents, index, lookup_arrays)
-                closest_input_cuda = torch.from_numpy(closest_latents_array).cuda().float()
-                result_batch, _ = run_on_batch(closest_input_cuda, net, opts, input_code=True)
+            if opts.save_latents:
 
-            else:
                 latent_array = result_latents.cpu().detach().numpy().astype('float32')
                 latents_save_path = os.path.join(out_path_latents, f'{global_i}.npy')
                 with open(latents_save_path, 'wb') as f:
                     np.save(f, latent_array)
+                
+            else:
+                
+                closest_latents_array = run_faiss(result_latents, index, lookup_arrays)
+                closest_input_cuda = torch.from_numpy(closest_latents_array).cuda().float()
+                result_batch, _ = run_on_batch(closest_input_cuda, net, opts, input_code=True)
 
             toc = time.time()
             global_time.append(toc - tic)
@@ -119,6 +123,13 @@ def main():
 
         global_i += opts.test_batch_size
 
+    # faiss index creation
+    if opts.save_latents:
+        index, lookup_arrays = setup_faiss(opts)
+        faiss.write_index(index, os.path.join(opts.faiss_dir, "index.bin"))
+        with open(os.path.join(opts.faiss_dir, 'lookup_array.npy'), 'wb') as f:
+            np.save(f, lookup_arrays)
+        
     # create stats
     stats_path = os.path.join(opts.exp_dir, 'stats.txt')
     result_str = 'Runtime {:.4f}+-{:.4f}'.format(np.mean(global_time), np.std(global_time))
@@ -134,14 +145,13 @@ def setup_faiss(opts, dim=512, first_n_latents=2):
     all_arrays = np.empty((0, 10, dim), dtype=np.float32)
 
     # load index
-    for root, dirs, files in tqdm(os.walk(opts.faiss_dir)):
+    for root, dirs, files in os.walk(opts.faiss_dir):
         for name in tqdm(files, position=0, leave=True):
             if name.endswith('.npy'):
-                with open(os.path.join(root, name), 'rb') as f:
-                    saved_latents = np.load(f)
-                    all_arrays = np.concatenate([all_arrays, saved_latents], axis=0)
-                    reshaped_latents = reshape_latent(saved_latents, first_n_latents)
-                    index.add(reshaped_latents)
+                saved_latents = np.load(os.path.join(root, name))
+                all_arrays = np.concatenate([all_arrays, saved_latents], axis=0)
+                reshaped_latents = reshape_latent(saved_latents, first_n_latents)
+                index.add(reshaped_latents)
     print(f'Total indices {index.ntotal}')
 
     return index, all_arrays
