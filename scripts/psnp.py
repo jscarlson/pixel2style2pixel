@@ -101,7 +101,8 @@ def main():
                     index, 
                     lookup_arrays, 
                     n_latents=opts.n_latents, 
-                    n_neighbors=opts.n_neighbors
+                    n_neighbors=opts.n_neighbors,
+                    verbose=opts.verbose
                 )
 
                 for bidx, clatent in enumerate(closest_latents):
@@ -141,7 +142,7 @@ def main():
 
     # faiss index creation
     if opts.save_latents:
-        index, lookup_arrays = setup_faiss(opts, n_latents=opts.n_latents)
+        index, lookup_arrays = setup_faiss(opts, n_latents=opts.n_latents, n_imgs=global_i)
         faiss.write_index(index, os.path.join(opts.faiss_dir, 'index.bin'))
         with open(os.path.join(opts.faiss_dir, 'lookup_array.npy'), 'wb') as f:
             np.save(f, lookup_arrays)
@@ -154,21 +155,22 @@ def main():
         f.write(result_str)
 
 
-def setup_faiss(opts, n_latents, dim=512):
+def setup_faiss(opts, n_latents, n_imgs, dim=512, wplus=10):
 
     # create index
     index = faiss.IndexFlatIP(dim*n_latents)
-    all_arrays = np.empty((0, 10, dim), dtype=np.float32)
+    print(n_imgs)
+    all_arrays = np.empty((n_imgs, wplus, dim), dtype=np.float32)
 
     # load index
-    for root, dirs, files in os.walk(opts.faiss_dir):
-        for name in tqdm(files, position=0, leave=True):
-            if name.endswith('.npy'):
-                saved_latents = np.load(os.path.join(root, name))
-                all_arrays = np.concatenate([all_arrays, saved_latents], axis=0)
-                reshaped_latents = reshape_latent(saved_latents, n_latents)
-                faiss.normalize_L2(reshaped_latents)
-                index.add(reshaped_latents)
+    root_dir = os.path.join(opts.faiss_dir, 'inference_latents')
+    for idx, filename in tqdm(enumerate(os.listdir(root_dir))):
+        saved_latents = np.load(os.path.join(root_dir, filename))
+        all_arrays[idx::] = saved_latents
+        reshaped_latents = reshape_latent(saved_latents, n_latents)
+        faiss.normalize_L2(reshaped_latents)
+        index.add(reshaped_latents)
+
     print(f'Total indices {index.ntotal}')
 
     return index, all_arrays

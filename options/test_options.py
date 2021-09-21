@@ -24,6 +24,7 @@ class TestOptions:
 		self.parser.add_argument('--save_images', action='store_true', help='Save images')
 		self.parser.add_argument('--n_latents', default=5, type=int, help='Number of W+ vectors to concat for FAISS')
 		self.parser.add_argument('--n_neighbors', default=10, type=int, help='Number of nearest neighbors to visualize')
+		self.parser.add_argument('--verbose', action='store_true', default=False, help='Be... verbose')
 
 		# arguments for style-mixing script
 		self.parser.add_argument('--n_images', type=int, default=None, help='Number of images to output. If None, run on all data')
