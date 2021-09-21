@@ -58,7 +58,8 @@ def main():
         dataset,
         batch_size=opts.test_batch_size,
         shuffle=True,
-        num_workers=int(opts.test_workers)
+        num_workers=int(opts.test_workers),
+        drop_last=True
     )
 
     # n images to generate
