@@ -159,14 +159,13 @@ def setup_faiss(opts, n_latents, n_imgs, dim=512, wplus=10):
 
     # create index
     index = faiss.IndexFlatIP(dim*n_latents)
-    print(n_imgs)
     all_arrays = np.empty((n_imgs, wplus, dim), dtype=np.float32)
 
     # load index
     root_dir = os.path.join(opts.faiss_dir, 'inference_latents')
     for idx, filename in tqdm(enumerate(os.listdir(root_dir))):
         saved_latents = np.load(os.path.join(root_dir, filename))
-        all_arrays[idx::] = saved_latents
+        all_arrays[idx:idx+opts.test_batch_size,:,:] = saved_latents
         reshaped_latents = reshape_latent(saved_latents, n_latents)
         faiss.normalize_L2(reshaped_latents)
         index.add(reshaped_latents)
