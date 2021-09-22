@@ -159,7 +159,7 @@ def main():
 def setup_faiss(opts, n_latents, n_imgs, dim=512, wplus=10):
 
     # create index
-    index = faiss.IndexFlatIP(dim*n_latents)
+    index = faiss.IndexFlatIP(dim)
     all_arrays = np.empty((n_imgs, wplus, dim), dtype=np.float32)
 
     # load index
@@ -198,7 +198,7 @@ def reshape_latent(latents, n_latents):
     if torch.is_tensor(latents):
         latents = latents.cpu().detach().numpy()
     return np.ascontiguousarray(
-        latents[:,:n_latents,:].reshape((latents.shape[0], -1))
+        np.sum(latents[:,:n_latents,:], axis=1).reshape((latents.shape[0], -1))
     )
 
 
