@@ -198,7 +198,7 @@ def reshape_latent(latents, n_latents):
     if torch.is_tensor(latents):
         latents = latents.cpu().detach().numpy()
     return np.ascontiguousarray(
-        latents[:,:n_latents*2:2,:].reshape((latents.shape[0], -1))
+        latents[:,:n_latents,:].reshape((latents.shape[0], -1))
     )
 
 
